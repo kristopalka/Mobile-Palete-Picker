@@ -1,20 +1,48 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import {StyleSheet, View} from 'react-native';
+import CameraPage from "./components/CameraPage";
+import {logger} from "./javascript/logger";
+import {useState} from "react";
+import PhotoPage from "./components/PhotoPage";
+
+const pages = {
+    camera: "camera",
+    photo: "photo",
+}
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+    const [page, goPage] = useState(pages.photo);
+    const [photo, setPhoto] = useState(null);
+
+    async function takePhoto(photoBase64) {
+        logger("Setting image")
+        setPhoto(photoBase64);
+        goPage(pages.photo);
+    }
+
+    function currentView() {
+        switch(page) {
+            case pages.camera:
+                return <CameraPage takePhoto={takePhoto}/>;
+            case pages.photo:
+                return <PhotoPage/>;
+
+        }
+    }
+
+
+    return (
+        <View style={styles.container}>
+            {currentView()}
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+    container: {
+        height: "100%",
+        width: "100%",
+        backgroundColor: '#000',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
 });
