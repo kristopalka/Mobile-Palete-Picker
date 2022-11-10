@@ -1,34 +1,20 @@
-function get_pixel_dataset(img, resized_pixels) {
+import {rgbToHex} from "./decimalHexConverts";
 
+export function getPalette(inputColors, k) {
+    const kMeansOut = kMeans(inputColors, k);
 
-
-    if (resized_pixels === undefined) resized_pixels = -1;
-    // Get pixel colors from a <canvas> with the image
-    const canvas = document.createElement("canvas");
-    const img_n_pixels = img.width * img.height;
-    let canvas_width = img.width;
-    let canvas_height = img.height;
-    if (resized_pixels > 0 && img_n_pixels > resized_pixels) {
-        const rescaled = rescale_dimensions(img.width, img.height, resized_pixels);
-        canvas_width = rescaled[0];
-        canvas_height = rescaled[1];
+    const colors = [];
+    for(let i=0; i<kMeansOut.length; i++) {
+        const r = Math.round(kMeansOut[i][0]);
+        const g = Math.round(kMeansOut[i][1]);
+        const b = Math.round(kMeansOut[i][2]);
+        colors.push([r, g, b]);
     }
-    canvas.width = canvas_width;
-    canvas.height = canvas_height;
-    const canvas_n_pixels = canvas_width * canvas_height;
-    const context = canvas.getContext("2d");
-    context.drawImage(img, 0, 0, canvas_width, canvas_height);
-    const flattened_dataset = context.getImageData(
-        0, 0, canvas_width, canvas_height).data;
-    const n_channels = flattened_dataset.length / canvas_n_pixels;
-    const dataset = [];
-    for (let i = 0; i < flattened_dataset.length; i += n_channels) {
-        dataset.push(flattened_dataset.slice(i, i + n_channels));
-    }
-    return dataset;
+    return colors;
 }
 
-function k_means(dataset, k) {
+
+function kMeans(dataset, k) {
     let i;
     let idx;
     if (k === undefined) k = Math.min(3, dataset.length);
@@ -55,7 +41,7 @@ function k_means(dataset, k) {
         }
         for (i = 0; i < dataset.length; ++i) {
             const point = dataset[i];
-            const nearest_centroid = nearest_neighbor(point, centroids);
+            const nearest_centroid = nearestNeighbor(point, centroids);
             clusters[nearest_centroid].push(point);
         }
         let converged = true;
@@ -69,7 +55,7 @@ function k_means(dataset, k) {
                 idx = Math.floor(random() * dataset.length);
                 centroid_i = dataset[idx];
             }
-            converged = converged && arrays_equal(centroid_i, centroids[i]);
+            converged = converged && arraysEqual(centroid_i, centroids[i]);
             centroids[i] = centroid_i;
         }
         if (converged) break;
@@ -93,7 +79,7 @@ function centroid(dataset) {
     return running_centroid;
 }
 
-function nearest_neighbor(point, neighbors) {
+function nearestNeighbor(point, neighbors) {
     let best_dist = Infinity; // squared distance
     let best_index = -1;
     for (let i = 0; i < neighbors.length; ++i) {
@@ -110,7 +96,7 @@ function nearest_neighbor(point, neighbors) {
     return best_index;
 }
 
-function arrays_equal(a1, a2) {
+function arraysEqual(a1, a2) {
     if (a1.length !== a2.length) return false;
     for (let i = 0; i < a1.length; ++i) {
         if (a1[i] !== a2[i]) return false;
@@ -118,10 +104,3 @@ function arrays_equal(a1, a2) {
     return true;
 }
 
-function rescale_dimensions(w, h, pixels) {
-    const aspect_ratio = w / h;
-    const scaling_factor = Math.sqrt(pixels / aspect_ratio);
-    const rescaled_w = Math.floor(aspect_ratio * scaling_factor);
-    const rescaled_h = Math.floor(scaling_factor);
-    return [rescaled_w, rescaled_h];
-}
