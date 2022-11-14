@@ -1,7 +1,5 @@
-import {rgbToHex} from "./decimalHexConverts";
-
-export function getPalette(inputColors, k) {
-    const kMeansOut = kMeans(inputColors, k);
+export function getKMeans(dataset, k) {
+    const kMeansOut = kMeans(dataset, k);
 
     const colors = [];
     for(let i=0; i<kMeansOut.length; i++) {

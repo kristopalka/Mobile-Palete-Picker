@@ -1,4 +1,4 @@
-import {StyleSheet, View} from 'react-native';
+import {BackHandler, StyleSheet, View} from 'react-native';
 import {useState} from "react";
 import CameraPage from "./components/CameraPage";
 import PhotoPage from "./components/PhotoPage";
@@ -10,6 +10,9 @@ const pages = {
 }
 
 export default function App() {
+    BackHandler.addEventListener("hardwareBackPress", backAction);
+
+
     const [page, goPage] = useState(pages.camera);
     const [photo, setPhoto] = useState(null);
 
@@ -29,6 +32,15 @@ export default function App() {
         }
     }
 
+    function backAction() {
+        switch(page) {
+            case pages.camera:
+                return false;
+            default:
+                goPage(pages.camera);
+                return true;
+        }
+    }
 
     return (
         <View style={styles.container}>
