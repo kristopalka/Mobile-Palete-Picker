@@ -1,8 +1,7 @@
 import {BackHandler, StyleSheet, View} from 'react-native';
 import {useState} from "react";
 import CameraPage from "./components/CameraPage";
-import PhotoPage from "./components/PhotoPage";
-import {logger} from "./javascript/logger";
+import PalettePage from "./components/PalettePage";
 
 const pages = {
     camera: "camera",
@@ -15,19 +14,21 @@ export default function App() {
 
     const [page, goPage] = useState(pages.camera);
     const [photo, setPhoto] = useState(null);
+    const [paletteLength, setPaletteLength] = useState(6);
 
-    async function takePhoto(photoBase64) {
-        logger("Setting image")
+    async function renderPaletteScreen(photoBase64, paletteLength) {
+        console.log("Setting image")
         setPhoto(photoBase64);
+        setPaletteLength(paletteLength)
         goPage(pages.photo);
     }
 
     function currentView() {
         switch(page) {
             case pages.camera:
-                return <CameraPage takePhoto={takePhoto}/>;
+                return <CameraPage renderPaletteScreen={renderPaletteScreen} paletteLength={paletteLength}/>;
             case pages.photo:
-                return <PhotoPage photo={photo}/>;
+                return <PalettePage photo={photo} paletteLength={paletteLength}/>;
 
         }
     }

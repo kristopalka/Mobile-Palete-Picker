@@ -23,4 +23,6 @@ export function getContrastColor(hexColor) {
 
     if (c.r*0.299 + c.g*0.587 + c.b*0.114 > 150) return "#000000";
     else return "#ffffff"
+
+    // return rgbToHex([255 - c.r, 255 - c.g, 255 - c.b]);
 }

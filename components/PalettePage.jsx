@@ -1,29 +1,29 @@
-import {Button, Dimensions, StyleSheet, View} from 'react-native';
+import {Dimensions, StyleSheet, View} from 'react-native';
 import Canvas, {Image as CanvasImage} from "react-native-canvas";
 import React, {useEffect, useRef, useState} from "react";
 import ColorPalette from "./components/color_palette/ColorPalette";
-import {getKMeans} from "../javascript/palette/kMens";
+import {getKMeans} from "../javascript/palette_generators/kMens";
 import {rgbToHex} from "../javascript/colors";
 import ImagePointers from "./components/ImagePointers";
+import Loading from "./components/Loading";
+import Button from "./components/Button";
+import {ntc} from "../javascript/color_naming";
 
 
-export default function PhotoPage(props) {
+export default function PalettePage(props) {
     const imageUrl = `data:image/jpg;base64,${props.photo}`
     const imageWidth = Dimensions.get('window').width * 0.9;
     const imageHeight = imageWidth * 4 / 3;
 
-    const ratio = 1 / 2;
+    const ratio = 1 / 3;
     const canvasWidth = Math.round(imageWidth * ratio);
     const canvasHeight = Math.round(imageHeight * ratio);
 
     const weirdMultiplier = 2.75; // https://github.com/iddan/react-native-canvas/issues/301
 
-    console.log("Image size:", imageWidth, imageHeight)
-    console.log("Canvas size:", canvasWidth, canvasHeight)
-
     const [palette, setPalette] = useState([]);
     const [points, setPoints] = useState([]);
-
+    const [loading, setLoading] = useState(true)
 
     const canvasRef = useRef(null)
 
@@ -37,45 +37,44 @@ export default function PhotoPage(props) {
         const image = new CanvasImage(canvas);
         image.src = imageUrl;
 
-
         image.addEventListener("load", async () => {
-            context.drawImage(image, 0, 0, canvas.width/weirdMultiplier, canvas.height/weirdMultiplier);
+            context.drawImage(image, 0, 0, canvas.width / weirdMultiplier, canvas.height / weirdMultiplier);
             context.getImageData(0, 0, canvas.width, canvas.height)
-                .then((imageData) => {
-                    // context.putImageData(imageData, 10, 10);
-                    initialPaletteCalculation(imageData.data);
+                .then((object) => {
+                    initialPaletteCalculation(object.data);
                 })
                 .catch((err) => {
-                    console.log("Error while calculation:", err);
+                    console.log("Error while getting image data:", err);
                 })
         });
     }, []);
 
 
-    function initialPaletteCalculation(data) {
-        const dataset = []
-        for (let i = 0; i < canvasWidth  * canvasHeight * 4; i += 4) {
-            dataset.push([data[i], data[i + 1], data[i + 2]])
+    function initialPaletteCalculation(imageData) {
+        const data = []
+        for (let i = 0; i < canvasWidth * canvasHeight * 4; i += 4) {
+            data.push([imageData[i], imageData[i + 1], imageData[i + 2]])
         }
-        const kMeans = getKMeans(dataset, 5)
+        const kMeans = getKMeans(data, props.paletteLength)
 
         const newPoints = []
         const newPalette = []
         for (let i = 0; i < kMeans.length; i++) {
-            let index = closestElementIndex(kMeans[i], dataset);
+            let index = closestElementIndex(kMeans[i], data);
             newPoints.push(indexToImagePoints(index))
             newPalette.push(rgbToHex(kMeans[i]))
         }
 
-        console.log("Calculated palette:", newPalette)
+        console.log("Calculated palette_generators:", newPalette)
         console.log("Palette points:", newPoints)
 
         setPoints(newPoints)
         setPalette(newPalette)
+        setLoading(false)
     }
 
 
-    function closestElementIndex(color, dataset) {
+    function closestElementIndex(color, data) {
         const diff = (color1, color2) => {
             return Math.pow(color1[0] - color2[0], 2) +
                 Math.pow(color1[1] - color2[1], 2) +
@@ -84,8 +83,13 @@ export default function PhotoPage(props) {
 
         let bestIndex = 0;
         let bestDiff = Number.MAX_VALUE;
-        for (let i = 0; i < dataset.length; i++) {
-            let currentDiff = diff(color, dataset[i]);
+        for (let i = 2 * canvasWidth + 2; i < data.length - 2 * canvasWidth - 2; i++) {
+            let currentDiff =
+                diff(color, data[i - 2]) +
+                2 * diff(color, data[i - 1]) +
+                diff(color, data[-2 * canvasWidth + i]) + 2 * diff(color, data[-canvasWidth + i]) + 4 * diff(color, data[i]) + 2 * diff(color, data[canvasWidth + i]) + diff(color, data[2 * canvasWidth + i]) +
+                2 * diff(color, data[i + 1]) +
+                diff(color, data[i + 2]);
             if (currentDiff < bestDiff) {
                 bestDiff = currentDiff;
                 bestIndex = i;
@@ -106,16 +110,14 @@ export default function PhotoPage(props) {
         const x = Math.round(point.x * ratio);
         const y = Math.round(point.y * ratio);
 
-        console.log("Get color from point:", x, y)
-
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
-        return await context.getImageData(Math.round(x ), Math.round(y ), 1, 1)
+        return await context.getImageData(Math.round(x), Math.round(y), 1, 1)
             .then((imageData) => {
                 return [imageData.data[0], imageData.data[1], imageData.data[2]];
             })
             .catch((err) => {
-                console.log("Error while calculation:", err);
+                console.log("Error while getting image data:", err);
             })
     }
 
@@ -135,10 +137,37 @@ export default function PhotoPage(props) {
         <View style={styles.container}>
             {React.useMemo(() => <Canvas ref={canvasRef} style={styles.canvas}/>, [])}
 
-            <ImagePointers width={imageWidth} height={imageHeight} imageUrl={imageUrl}
-                           points={points} colors={palette} movePointer={movePointer}/>
+            {loading ? <Loading/> :
+                <View>
+                    <ImagePointers
+                        width={imageWidth} height={imageHeight} imageUrl={imageUrl}
+                        points={points} colors={palette} movePointer={movePointer}
+                    />
 
-            <ColorPalette colors={palette} value={palette[0]}/>
+                    <View style={{margin: 15}}/>
+                    <ColorPalette colors={palette} value={palette[0]}/>
+
+                    <View style={{margin: 15}}/>
+                    <View>
+                        <View style={styles.buttonContainer}>
+                            <Button title={"Simple"} onPress={() => {
+                            }} style={styles.button}/>
+                            <Button title={"CSS"} onPress={() => {
+                            }} style={styles.button}/>
+                        </View>
+                        <View style={styles.buttonContainer}>
+                            <Button title={"Code"} onPress={() => {
+                            }} style={styles.button}/>
+                            <Button title={"Image"} onPress={() => {
+                                let n_match  = ntc.name("#6195ED")
+                                console.log(n_match)
+
+
+                            }} style={styles.button}/>
+                        </View>
+                    </View>
+                </View>
+            }
         </View>
     );
 }
@@ -148,20 +177,20 @@ const styles = StyleSheet.create({
         height: "100%",
         width: "100%",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "space-evenly",
         backgroundColor: "white",
-    },
-    imageBox: (w, h) => ({
-        width: w,
-        height: h,
-        backgroundColor: "black",
-    }),
-    image: {
-        width: "100%",
-        height: "100%",
     },
     canvas: {
         opacity: 0,
         position: "absolute",
+    },
+    buttonContainer: {
+        flexDirection: "row",
+        justifyContent: "center"
+    },
+    button: {
+        height: 50,
+        width: 140,
+        margin: 5,
     },
 });

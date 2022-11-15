@@ -2,20 +2,27 @@ import {Camera, CameraType} from 'expo-camera';
 import {useState} from 'react';
 import {StyleSheet, TouchableOpacity, useWindowDimensions, View} from 'react-native';
 import Lens from "./components/Lenx";
-import {logger} from "../javascript/logger";
+import SegmentedControl from "./components/SegmentedControll";
+import {AntDesign, Entypo, Feather} from "@expo/vector-icons";
+import Alert from "./components/Alert";
 
 export default function CameraPage(props) {
     const {width, height} = useWindowDimensions();
     const [camera, setCamera] = useState(null);
     const [permission, requestPermission] = Camera.useCameraPermissions();
+    const [alert, setAlert] = useState(false);
+
+
+    const paletteLengths = [2, 3, 4, 5, 6, 7, 8, 9, 10]
+    const [paletteLengthIndex, setPaletteLengthIndex] = useState(props.paletteLength - 2);
 
     if (!permission) return <View/>;
     if (!permission.granted) requestPermission().catch();
 
     async function takePicture() {
-        logger("Taking picture")
+        console.log("Taking picture")
         const data = await camera.takePictureAsync({base64: true, quality: 0.5});
-        props.takePhoto(data.base64);
+        props.renderPaletteScreen(data.base64, paletteLengths[paletteLengthIndex]);
     }
 
 
@@ -30,7 +37,37 @@ export default function CameraPage(props) {
                 </View>
             </Camera>
 
-            <TouchableOpacity style={styles.captureButton} onPress={takePicture}></TouchableOpacity>
+            <SegmentedControl
+                tabs={paletteLengths.map(element => element.toString())}
+                currentIndex={paletteLengthIndex}
+                onChange={setPaletteLengthIndex}
+                width={300}
+                paddingVertical={10}
+            />
+
+            <View style={styles.navigation}>
+                <TouchableOpacity onPress={() => {setAlert(true)}}>
+                    <Entypo name="help" size={40} color={"white"}/>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={takePicture}>
+                    <AntDesign name="camera" size={80} color={"white"}/>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => {}}>
+                    <Feather name="square" size={40} color={"white"} />
+                {/*    opis algorytmów?    */}
+                </TouchableOpacity>
+
+                <Alert
+                    visible={alert}
+                    setVisible={setAlert}
+                    title={"Palette Picker"}
+                    message={"After taking a photo app will generate colors palette. Chose how many colors in palette do you need." +
+                        "\n\nMobile Palette Picker v1.0\nKrzysztof Pałka\nAndrzej Krzywda"}
+                />
+
+            </View>
         </View>
     );
 }
@@ -56,13 +93,11 @@ const styles = StyleSheet.create({
         borderRadius: 70,
         margin: -37,
     },
-    captureButton: {
-        width: 80,
-        height: 80,
-        backgroundColor: "white",
-        borderRadius: 50,
-        borderStyle: "solid",
-        borderColor: "gray",
-        borderWidth: 6,
+    navigation: {
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "space-evenly",
+        alignItems: "center",
+        marginVertical: 20,
     },
 });
