@@ -63,6 +63,7 @@ export default function PalettePage(props) {
                     <Button title={"Image"}
                             style={styles.button}
                             onPress={() => {
+                                props.exportImage(palette, points)
                             }}
                     />
                     <Button title={"Simple"}

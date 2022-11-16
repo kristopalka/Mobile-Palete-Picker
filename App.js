@@ -2,18 +2,18 @@ import {BackHandler, Dimensions, StyleSheet, View} from 'react-native';
 import React, {useEffect, useRef, useState} from "react";
 import CameraPage from "./components/CameraPage";
 import PalettePage from "./components/PalettePage";
-import {generateSimpleExport} from "./javascript/exporting";
 import TextExportPage from "./components/TextExportPage";
 import Canvas from "react-native-canvas";
 import {canvasWidth, generatePalette, getColor, initCanvas} from "./javascript/palette_generators/generate";
 import Loading from "./components/other/Loading";
+import ImageExportPage from "./components/ImageExportPage";
 
 const pages = {
     camera: "camera",
     palette: "photo",
     loading: "loading",
-    exportText: "export-simple",
-    exportCss: "export-css",
+    exportText: "export-text",
+    exportImage: "export-image",
 }
 
 export default function App() {
@@ -59,6 +59,12 @@ export default function App() {
         goPage(pages.exportText)
     }
 
+    async function exportImage(newPalette, newPoints) {
+        setPalette(newPalette)
+        setPoints(newPoints)
+        goPage(pages.exportImage)
+    }
+
     function currentView() {
         switch(page) {
             case pages.camera:
@@ -77,11 +83,22 @@ export default function App() {
                     imageHeight={imageHeight}
                     image={image}
                     exportText={exportText}
+                    exportImage={exportImage}
                 />;
             case pages.exportText:
-                return <TextExportPage text={exportedText} back={() => {
-                    goPage(pages.palette);
-                }}/>;
+                return <TextExportPage
+                    text={exportedText}
+                    back={() => {
+                        goPage(pages.palette);
+                    }}
+                />;
+            case pages.exportImage:
+                return <ImageExportPage
+                    palette={palette}
+                    back={() => {
+                        goPage(pages.palette);
+                    }}
+                />;
             case pages.loading:
                 return <Loading/>;
         }
