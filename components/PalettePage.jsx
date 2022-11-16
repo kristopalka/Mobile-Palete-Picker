@@ -1,13 +1,12 @@
 import {Dimensions, StyleSheet, View} from 'react-native';
 import Canvas, {Image as CanvasImage} from "react-native-canvas";
 import React, {useEffect, useRef, useState} from "react";
-import ColorPalette from "./components/color_palette/ColorPalette";
+import ColorPalette from "./other/color_palette/ColorPalette";
 import {getKMeans} from "../javascript/palette_generators/kMens";
 import {rgbToHex} from "../javascript/colors";
-import ImagePointers from "./components/ImagePointers";
-import Loading from "./components/Loading";
-import Button from "./components/Button";
-import {ntc} from "../javascript/color_naming";
+import ImagePointers from "./other/ImagePointers";
+import Loading from "./other/Loading";
+import Button from "./other/Button";
 
 
 export default function PalettePage(props) {
@@ -149,21 +148,19 @@ export default function PalettePage(props) {
 
                     <View style={{margin: 15}}/>
                     <View>
-                        <View style={styles.buttonContainer}>
-                            <Button title={"Simple"} onPress={() => {
+                        <View style={styles.buttonRow}>
+                            <Button title={"Code"} onPress={() => {
                             }} style={styles.button}/>
                             <Button title={"CSS"} onPress={() => {
                             }} style={styles.button}/>
                         </View>
-                        <View style={styles.buttonContainer}>
-                            <Button title={"Code"} onPress={() => {
-                            }} style={styles.button}/>
+                        <View style={styles.buttonRow}>
                             <Button title={"Image"} onPress={() => {
-                                let n_match  = ntc.name("#6195ED")
-                                console.log(n_match)
-
-
                             }} style={styles.button}/>
+                            <Button title={"Simple"} style={styles.button}
+                                    onPress={() => {
+                                        props.exportSimple(palette)
+                                    }}/>
                         </View>
                     </View>
                 </View>
@@ -184,7 +181,7 @@ const styles = StyleSheet.create({
         opacity: 0,
         position: "absolute",
     },
-    buttonContainer: {
+    buttonRow: {
         flexDirection: "row",
         justifyContent: "center"
     },

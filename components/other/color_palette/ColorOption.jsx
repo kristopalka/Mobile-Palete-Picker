@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {ntc} from "../../../javascript/color_naming";
+import {copyToClipboard} from "../../../javascript/exporting";
 
 
 const ColorOption = (props) => {
@@ -13,7 +14,7 @@ const ColorOption = (props) => {
     return (
         <View>
             <TouchableOpacity
-                onPress={() => onColorChange(color)}
+                onPress={() => {copyToClipboard(color)}}
                 style={[
                     styles.colorOption(width, height),
                     {backgroundColor: color},

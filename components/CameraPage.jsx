@@ -1,10 +1,10 @@
 import {Camera, CameraType} from 'expo-camera';
 import {useState} from 'react';
 import {StyleSheet, TouchableOpacity, useWindowDimensions, View} from 'react-native';
-import Lens from "./components/Lenx";
-import SegmentedControl from "./components/SegmentedControll";
+import Lens from "./other/Lenx";
+import SegmentedControl from "./other/SegmentedControll";
 import {AntDesign, Entypo, Feather} from "@expo/vector-icons";
-import Alert from "./components/Alert";
+import Alert from "./other/Alert";
 
 export default function CameraPage(props) {
     const {width, height} = useWindowDimensions();
@@ -56,14 +56,14 @@ export default function CameraPage(props) {
 
                 <TouchableOpacity onPress={() => {}}>
                     <Feather name="square" size={40} color={"white"} />
-                {/*    opis algorytmów?    */}
+                    {/* todo opis algorytmów? */}
                 </TouchableOpacity>
 
                 <Alert
                     visible={alert}
                     setVisible={setAlert}
                     title={"Palette Picker"}
-                    message={"After taking a photo app will generate colors palette. Chose how many colors in palette do you need." +
+                    message={"After taking a palette app will generate colors palette. Chose how many colors in palette do you need." +
                         "\n\nMobile Palette Picker v1.0\nKrzysztof Pałka\nAndrzej Krzywda"}
                 />
 
