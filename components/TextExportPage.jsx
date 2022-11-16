@@ -4,7 +4,7 @@ import Button from "./other/Button";
 import {borderRadius, borderWidth} from "../javascript/css";
 import {copyToClipboard} from "../javascript/exporting";
 
-export default function ExportPage(props) {
+export default function TextExportPage(props) {
     const [text, onChangeText] = useState(props.text);
 
 
@@ -59,13 +59,14 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
     },
     input: {
-        padding: 15,
+        flexWrap: "nowrap",
+        paddingLeft: 15,
         borderWidth: borderWidth,
         borderColor: "black",
         borderRadius: borderRadius,
         height: "50%",
-        width: "80%",
-        fontSize: 20,
+        width: "90%",
+        fontSize: 15,
         marginBottom: 30,
         marginTop: 10,
     },

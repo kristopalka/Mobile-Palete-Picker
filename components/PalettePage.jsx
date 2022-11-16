@@ -4,6 +4,7 @@ import ColorPalette from "./other/color_palette/ColorPalette";
 import {rgbToHex} from "../javascript/colors";
 import ImagePointers from "./other/ImagePointers";
 import Button from "./other/Button";
+import {generateCodeExport, generateCssExport, generateSimpleExport} from "../javascript/exporting";
 
 
 export default function PalettePage(props) {
@@ -48,11 +49,13 @@ export default function PalettePage(props) {
                     <Button title={"Code"}
                             style={styles.button}
                             onPress={() => {
+                                props.exportText(palette, points, generateCodeExport)
                             }}
                     />
                     <Button title={"CSS"}
                             style={styles.button}
                             onPress={() => {
+                                props.exportText(palette, points, generateCssExport)
                             }}
                     />
                 </View>
@@ -65,7 +68,7 @@ export default function PalettePage(props) {
                     <Button title={"Simple"}
                             style={styles.button}
                             onPress={() => {
-                                props.exportSimple(palette, points)
+                                props.exportText(palette, points, generateSimpleExport)
                             }}
                     />
                 </View>

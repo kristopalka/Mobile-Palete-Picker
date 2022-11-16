@@ -3,7 +3,7 @@ import React, {useEffect, useRef, useState} from "react";
 import CameraPage from "./components/CameraPage";
 import PalettePage from "./components/PalettePage";
 import {generateSimpleExport} from "./javascript/exporting";
-import ExportPage from "./components/ExportPage";
+import TextExportPage from "./components/TextExportPage";
 import Canvas from "react-native-canvas";
 import {canvasWidth, generatePalette, getColor, initCanvas} from "./javascript/palette_generators/generate";
 import Loading from "./components/other/Loading";
@@ -12,7 +12,8 @@ const pages = {
     camera: "camera",
     palette: "photo",
     loading: "loading",
-    exportSimple: "export-simple",
+    exportText: "export-simple",
+    exportCss: "export-css",
 }
 
 export default function App() {
@@ -29,7 +30,7 @@ export default function App() {
     const [palette, setPalette] = useState([]);
     const [points, setPoints] = useState([]);
     const [paletteLength, setPaletteLength] = useState(6);
-    const [exportText, setExportText] = useState("");
+    const [exportedText, setExportedText] = useState("");
 
 
     useEffect(() => {
@@ -51,12 +52,11 @@ export default function App() {
             });
     }
 
-
-    async function exportSimple(newPalette, newPoints) {
-        setExportText(generateSimpleExport(palette))
+    async function exportText(newPalette, newPoints, generatingFunction) {
+        setExportedText(generatingFunction(palette))
         setPalette(newPalette)
         setPoints(newPoints)
-        goPage(pages.exportSimple)
+        goPage(pages.exportText)
     }
 
     function currentView() {
@@ -76,15 +76,12 @@ export default function App() {
                     imageWidth={imageWidth}
                     imageHeight={imageHeight}
                     image={image}
-                    exportSimple={exportSimple}
+                    exportText={exportText}
                 />;
-            case pages.exportSimple:
-                return <ExportPage
-                    text={exportText}
-                    back={() => {
-                        goPage(pages.palette)
-                    }}
-                />;
+            case pages.exportText:
+                return <TextExportPage text={exportedText} back={() => {
+                    goPage(pages.palette);
+                }}/>;
             case pages.loading:
                 return <Loading/>;
         }
@@ -94,7 +91,7 @@ export default function App() {
         switch(page) {
             case pages.camera:
                 return false;
-            case pages.exportSimple:
+            case pages.exportText:
                 goPage(pages.palette);
                 return true;
             default:
