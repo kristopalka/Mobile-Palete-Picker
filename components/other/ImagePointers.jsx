@@ -1,4 +1,4 @@
-import {Button, Image, StyleSheet, View} from 'react-native';
+import {Image, StyleSheet, View} from 'react-native';
 
 import Pointer from "./Pointer";
 import {useRef} from "react";
@@ -24,7 +24,7 @@ export default function ImagePointers(props) {
                         key={i} x={item.x} y={item.y} minX={0} minY={0}
                         maxX={width + pointerSize - pointerWidth} maxY={height + pointerSize - pointerWidth}
                         children={
-                            <View ref={e => pointers.current[i] = e} collapsable={false}>
+                            <View ref={e => pointers.current[i] = e}>
                                 <Pointer size={pointerSize} width={pointerWidth} color={props.colors[i]}/>
                             </View>
                         }

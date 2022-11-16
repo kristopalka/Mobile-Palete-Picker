@@ -1,6 +1,11 @@
 // https://github.com/VerboseDaVinci/Hyper-Text-DaVinci/blob/817b1d32da125b18954e6b6630bcba283cfa4a65/convert_image.js
 
 export function getKMeans(dataset, k) {
+    if(dataset === undefined) {
+        console.log("Error: dataset undefined");
+        return null;
+    }
+
     const kMeansOut = kMeans(dataset, k);
 
     const colors = [];

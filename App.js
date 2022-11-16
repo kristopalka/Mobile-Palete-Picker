@@ -1,32 +1,56 @@
-import {BackHandler, StyleSheet, View} from 'react-native';
-import {useState} from "react";
+import {BackHandler, Dimensions, StyleSheet, View} from 'react-native';
+import React, {useEffect, useRef, useState} from "react";
 import CameraPage from "./components/CameraPage";
 import PalettePage from "./components/PalettePage";
 import {generateSimpleExport} from "./javascript/exporting";
 import ExportPage from "./components/ExportPage";
+import Canvas from "react-native-canvas";
+import {canvasWidth, generatePalette, getColor, initCanvas} from "./javascript/palette_generators/generate";
+import Loading from "./components/other/Loading";
 
 const pages = {
     camera: "camera",
     palette: "photo",
+    loading: "loading",
     exportSimple: "export-simple",
 }
 
 export default function App() {
     BackHandler.addEventListener("hardwareBackPress", backAction);
+    const canvasRef = useRef(null)
 
+    const imageWidth = Dimensions.get('window').width * 0.9;
+    const imageHeight = imageWidth * 4 / 3;
+    const [image, setImage] = useState(null);
+
+    const ratio = canvasWidth / imageWidth;
 
     const [page, goPage] = useState(pages.camera);
-    const [photo, setPhoto] = useState(null);
+    const [palette, setPalette] = useState([]);
+    const [points, setPoints] = useState([]);
     const [paletteLength, setPaletteLength] = useState(6);
-
     const [exportText, setExportText] = useState("");
 
-    async function renderPaletteScreen(photoBase64, paletteLength) {
-        console.log("Setting image")
-        setPhoto(photoBase64);
-        setPaletteLength(paletteLength)
-        goPage(pages.palette);
+
+    useEffect(() => {
+        initCanvas(canvasRef);
+    }, []);
+
+
+    async function renderPaletteScreen(imageBase64, newPaletteLength) {
+        console.log("Processing palette");
+        goPage(pages.loading)
+        await generatePalette(canvasRef, imageBase64, newPaletteLength, ratio,
+            (palette, points) => {
+                setPalette(palette);
+                setPoints(points);
+
+                setPaletteLength(newPaletteLength);
+                setImage(imageBase64);
+                goPage(pages.palette);
+            });
     }
+
 
     async function exportSimple(palette) {
         setExportText(generateSimpleExport(palette))
@@ -38,11 +62,21 @@ export default function App() {
             case pages.camera:
                 return <CameraPage renderPaletteScreen={renderPaletteScreen} paletteLength={paletteLength}/>;
             case pages.palette:
-                return <PalettePage photo={photo} paletteLength={paletteLength}
-                exportSimple={exportSimple}/>;
+                return <PalettePage
+                    palette={palette}
+                    points={points}
+                    getColor={async (point) => {
+                        return await getColor(point, ratio, canvasRef)
+                    }}
+                    imageWidth={imageWidth}
+                    imageHeight={imageHeight}
+                    image={image}
+                    exportSimple={exportSimple}
+                />;
             case pages.exportSimple:
-                return <ExportPage text={exportText} />;
-
+                return <ExportPage text={exportText}/>;
+            case pages.loading:
+                return <Loading/>;
         }
     }
 
@@ -62,6 +96,7 @@ export default function App() {
     return (
         <View style={styles.container}>
             {currentView()}
+            {React.useMemo(() => <Canvas ref={canvasRef} style={styles.canvas}/>, [])}
         </View>
     );
 }
@@ -73,5 +108,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#000',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    canvas: {
+        opacity: 0,
+        position: "absolute",
+        left: -500,
+        top: -500,
     },
 });

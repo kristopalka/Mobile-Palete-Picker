@@ -22,7 +22,9 @@ export default function CameraPage(props) {
     async function takePicture() {
         console.log("Taking picture")
         const data = await camera.takePictureAsync({base64: true, quality: 0.5});
-        props.renderPaletteScreen(data.base64, paletteLengths[paletteLengthIndex]);
+
+        const imageBase64 = `data:image/jpg;base64,${data.base64}`
+        props.renderPaletteScreen(imageBase64, paletteLengths[paletteLengthIndex]);
     }
 
 

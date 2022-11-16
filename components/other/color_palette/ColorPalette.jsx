@@ -4,15 +4,12 @@ import {View, Text, StyleSheet, Dimensions} from 'react-native';
 
 import ColorOption from './ColorOption';
 
-const windowWidth = Dimensions.get('window').width;
-
-
 
 const ColorPalette = (props) => {
     const {colors, defaultColor, icon, onChange, paletteStyles, scaleToWindow, title, titleStyles, value} = props;
     const [color, setColor] = useState(value || defaultColor);
 
-    const width = (windowWidth * 0.8) / colors.length;
+    const width = (Dimensions.get('window').width * 0.8) / colors.length;
     const height = 60;
 
     useEffect(() => {

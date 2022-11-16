@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
         width: width,
         height: height,
         borderRadius: 10,
+        margin: 2,
     }),
     text: (text, width) => ({
         marginTop: 5,
