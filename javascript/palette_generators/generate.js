@@ -93,10 +93,10 @@ function indexToImagePoints(index, ratio) {
 
 export async function getColor(point, ratio, canvasRef) {
     const x = Math.round(point.x * ratio);
-    const y = Math.round(point.y * ratio);
+    const y = Math.round(point.y * ratio)
 
     const context = canvasRef.current.getContext('2d');
-    return await context.getImageData(Math.round(x), Math.round(y), 1, 1)
+    return await context.getImageData(x,y, 1, 1)
         .then((imageData) => {
             return [imageData.data[0], imageData.data[1], imageData.data[2]];
         })

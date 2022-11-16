@@ -15,6 +15,12 @@ export default function PalettePage(props) {
         const newColor = rgbToHex(await props.getColor(newPoint));
         console.log("New color:", newColor)
 
+        let newPoints = points.map((c, i) => {
+            if (i === index) return newPoint;
+            else return c;
+        });
+        setPoints(newPoints);
+
         let newPalette = palette.map((c, i) => {
             if (i === index) return newColor;
             else return c;
@@ -22,16 +28,13 @@ export default function PalettePage(props) {
         setPalette(newPalette)
     }
 
-    const pal = ["#000000", "#000000"]
-    const poi = [{"x": 75.40363636363638, "y": 30.632727272727276}, {"x": 4.712727272727274, "y": 205.0036363636364}]
-
     return (
         <View style={styles.container}>
 
             <ImagePointers
                 width={props.imageWidth} height={props.imageHeight}
                 imageUrl={props.image}
-                points={points}
+                points={props.points}
                 colors={palette}
                 movePointer={movePointer}
             />
@@ -62,7 +65,7 @@ export default function PalettePage(props) {
                     <Button title={"Simple"}
                             style={styles.button}
                             onPress={() => {
-                                props.exportSimple(palette)
+                                props.exportSimple(palette, points)
                             }}
                     />
                 </View>

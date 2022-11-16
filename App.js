@@ -52,15 +52,20 @@ export default function App() {
     }
 
 
-    async function exportSimple(palette) {
+    async function exportSimple(newPalette, newPoints) {
         setExportText(generateSimpleExport(palette))
+        setPalette(newPalette)
+        setPoints(newPoints)
         goPage(pages.exportSimple)
     }
 
     function currentView() {
         switch(page) {
             case pages.camera:
-                return <CameraPage renderPaletteScreen={renderPaletteScreen} paletteLength={paletteLength}/>;
+                return <CameraPage
+                    renderPaletteScreen={renderPaletteScreen}
+                    paletteLength={paletteLength}
+                />;
             case pages.palette:
                 return <PalettePage
                     palette={palette}
@@ -74,7 +79,12 @@ export default function App() {
                     exportSimple={exportSimple}
                 />;
             case pages.exportSimple:
-                return <ExportPage text={exportText}/>;
+                return <ExportPage
+                    text={exportText}
+                    back={() => {
+                        goPage(pages.palette)
+                    }}
+                />;
             case pages.loading:
                 return <Loading/>;
         }

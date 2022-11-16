@@ -1,5 +1,8 @@
 import {StyleSheet, TextInput, View} from 'react-native';
 import React, {useState} from "react";
+import Button from "./other/Button";
+import {borderRadius, borderWidth} from "../javascript/css";
+import {copyToClipboard} from "../javascript/exporting";
 
 export default function ExportPage(props) {
     const [text, onChangeText] = useState(props.text);
@@ -15,6 +18,34 @@ export default function ExportPage(props) {
                 placeholder=""
                 keyboardType="default"
             />
+            <View>
+                <View style={styles.buttonRow}>
+                    <Button title={"Back"}
+                            style={styles.button}
+                            onPress={props.back}
+                    />
+                    <Button title={"Copy"}
+                            style={styles.button}
+                            onPress={() => {
+                                copyToClipboard(text);
+                            }}
+                    />
+                </View>
+                {/*<View style={styles.buttonRow}>*/}
+                {/*    <Button title={"Share"}*/}
+                {/*            style={styles.button}*/}
+                {/*            onPress={() => {*/}
+                {/*                /!* todo share button *!/*/}
+                {/*            }}*/}
+                {/*    />*/}
+                {/*    <Button title={"Save"}*/}
+                {/*            style={styles.button}*/}
+                {/*            onPress={() => {*/}
+                {/*                /!* todo save to file button *!/*/}
+                {/*            }}*/}
+                {/*    />*/}
+                {/*</View>*/}
+            </View>
         </View>
     );
 }
@@ -28,14 +59,23 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
     },
     input: {
-        borderWidth: 1,
-        borderColor: "gray",
+        padding: 15,
+        borderWidth: borderWidth,
+        borderColor: "black",
+        borderRadius: borderRadius,
         height: "50%",
         width: "80%",
-        fontSize: 17,
-        textDecorationColor: "black",
-        textAlign: "center",
+        fontSize: 20,
         marginBottom: 30,
         marginTop: 10,
-    }
+    },
+    buttonRow: {
+        flexDirection: "row",
+        justifyContent: "center"
+    },
+    button: {
+        height: 50,
+        width: 140,
+        margin: 5,
+    },
 });
