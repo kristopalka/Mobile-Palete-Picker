@@ -1,4 +1,4 @@
-import {StyleSheet, TextInput, View} from 'react-native';
+import {StyleSheet, TextInput, View, Share} from 'react-native';
 import React, {useState} from "react";
 import Button from "./other/Button";
 import {borderRadius, borderWidth} from "../javascript/css";
@@ -7,6 +7,23 @@ import {copyToClipboard} from "../javascript/exporting";
 export default function TextExportPage(props) {
     const [text, onChangeText] = useState(props.text);
 
+    const onShare = async () => {
+        try {
+            const result = await Share.share({message: text});
+
+            if (result.action === Share.sharedAction) {
+                if (result.activityType) {
+                    // shared with activity type of result.activityType
+                } else {
+                    // shared
+                }
+            } else if (result.action === Share.dismissedAction) {
+                // dismissed
+            }
+        } catch (error) {
+            alert(error.message);
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -31,20 +48,16 @@ export default function TextExportPage(props) {
                             }}
                     />
                 </View>
-                {/*<View style={styles.buttonRow}>*/}
-                {/*    <Button title={"Share"}*/}
-                {/*            style={styles.button}*/}
-                {/*            onPress={() => {*/}
-                {/*                /!* todo share button *!/*/}
-                {/*            }}*/}
-                {/*    />*/}
-                {/*    <Button title={"Save"}*/}
-                {/*            style={styles.button}*/}
-                {/*            onPress={() => {*/}
-                {/*                /!* todo save to file button *!/*/}
-                {/*            }}*/}
-                {/*    />*/}
-                {/*</View>*/}
+                <View style={styles.buttonRow}>
+                    <Button title={"Share"}
+                        style={styles.button}
+                        onPress={() => onShare()}
+                    />
+                    <Button title={"Save"}
+                        style={styles.button}
+                        onPress={() => console.log("Save")}
+                    />
+                </View>
             </View>
         </View>
     );
