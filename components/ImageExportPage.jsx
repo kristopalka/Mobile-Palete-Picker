@@ -10,9 +10,8 @@ export default function ImageExportPage(props) {
     const canvasRef = useRef(null)
 
     const width = Dimensions.get('window').width * 0.9;
-    const height = 200;
+    const height = 300;
     const segmentLength = width / palette.length;
-
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -43,6 +42,16 @@ export default function ImageExportPage(props) {
                             onPress={() => {
                                 copyToClipboard(text);
                             }}
+                    />
+                </View>
+                <View style={styles.buttonRow}>
+                    <Button title={"Share"}
+                            style={styles.button}
+                            onPress={() => console.log("sharing")}
+                    />
+                    <Button title={"Save"}
+                            style={styles.button}
+                            onPress={() => console.log("save")}
                     />
                 </View>
             </View>
