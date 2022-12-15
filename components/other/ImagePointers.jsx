@@ -21,19 +21,19 @@ export default function ImagePointers(props) {
             {
                 props.points.map((item, i) => {
                     return <Draggable
-                        key={i} x={Math.round(item.x)} y={Math.round(item.y)} minX={0} minY={0}
+                        key={i} x={item.x} y={item.y} minX={0} minY={0}
                         maxX={width + pointerSize - pointerWidth} maxY={height + pointerSize - pointerWidth}
                         children={
-                            <View ref={e => pointers.current[i] = e} collapsable={false}>
+                            <View ref={e => pointers.current[i] = e}>
                                 <Pointer size={pointerSize} width={pointerWidth} color={props.colors[i]}/>
                             </View>
                         }
                         onDragRelease={() => {
                             pointers.current[i].measureLayout(imageBox.current,
                                 async (x, y) => {
-                                    const newCoords = {x: x, y: y}
-                                    console.log("Pointer", i, "moved to", newCoords)
-                                    props.movePointer(i, newCoords);
+                                    const newPoint = {x: x, y: y}
+                                    console.log("Pointer", i, "moved to", newPoint)
+                                    props.movePointer(i, newPoint);
                                 })
                         }}
 
@@ -49,6 +49,9 @@ const styles = StyleSheet.create({
         width: w,
         height: h,
         backgroundColor: "black",
+        borderRadius: 2,
+        borderColor: "black",
+        borderWidth: 2,
     }),
     image: {
         width: "100%",

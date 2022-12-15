@@ -1,22 +1,16 @@
 import PropTypes from 'prop-types';
 import React, { useState, useEffect, Fragment, useCallback } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import {View, Text, StyleSheet, Dimensions} from 'react-native';
 
 import ColorOption from './ColorOption';
 
+
 const ColorPalette = (props) => {
-    const {
-        colors,
-        defaultColor,
-        icon,
-        onChange,
-        paletteStyles,
-        scaleToWindow,
-        title,
-        titleStyles,
-        value,
-    } = props;
+    const {colors, defaultColor, icon, onChange, paletteStyles, scaleToWindow, title, titleStyles, value} = props;
     const [color, setColor] = useState(value || defaultColor);
+
+    const width = (Dimensions.get('window').width * 0.8) / colors.length;
+    const height = 60;
 
     useEffect(() => {
         value && setColor(value);
@@ -38,6 +32,8 @@ const ColorPalette = (props) => {
                         onColorChange={onColorChange}
                         scaleToWindow={scaleToWindow}
                         isSelected={value ? value ===c : color ===c}
+                        width={width}
+                        height={height}
                     />
                 ))}
             </View>
@@ -53,7 +49,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'space-evenly'
     }
 });
 
