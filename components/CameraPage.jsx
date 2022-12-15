@@ -57,7 +57,7 @@ export default function CameraPage(props) {
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => {}}>
-                    <Feather name="square" size={40} color={"white"} />
+                    <Feather name="square" size={40} color={"black"} />
                     {/* todo opis algorytmów? */}
                 </TouchableOpacity>
 

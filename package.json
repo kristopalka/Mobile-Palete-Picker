@@ -22,7 +22,8 @@
     "react-native-draggable": "^3.3.0",
     "react-native-fs": "^2.20.0",
     "react-native-indicators": "^0.17.0",
-    "react-native-webview": "11.23.0"
+    "react-native-webview": "11.23.0",
+    "expo-updates": "~0.14.7"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
